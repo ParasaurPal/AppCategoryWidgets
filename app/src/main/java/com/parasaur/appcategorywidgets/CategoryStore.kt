@@ -24,10 +24,10 @@ object CategoryStore {
  @Suppress("DEPRECATION")
  fun apps(c:Context):List<ApplicationInfo>{
   val p=c.packageManager
-  // Include every installed application package, including preinstalled/system
-  // apps that do not publish a launcher icon. The widget can still show their
-  // names; tapping one opens it only when Android provides a launch intent.
+  // Show only installed apps that Android can launch from the app drawer.
+  // This keeps system components and background-only packages out of the list.
   return p.getInstalledApplications(0)
+   .filter{p.getLaunchIntentForPackage(it.packageName)!=null}
    .sortedBy{p.getApplicationLabel(it).toString().lowercase()}
  }
 }
