@@ -1,5 +1,6 @@
 package com.parasaur.appcategorywidgets
 
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
@@ -23,6 +24,10 @@ class CategoryWidgetProvider:AppWidgetProvider(){
    v.setRemoteAdapter(R.id.widget_list,service);v.setRemoteAdapter(R.id.widget_grid,service)
    v.setInt(R.id.widget_grid,"setNumColumns",s.columns.coerceIn(2,5))
    v.setEmptyView(if(s.layout=="List")R.id.widget_list else R.id.widget_grid,R.id.widget_empty)
+   val configure=Intent(c,WidgetConfigActivity::class.java).putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id).setData(Uri.parse("appcategorywidgets://configure/$id"))
+   val configPending=PendingIntent.getActivity(c,id,configure,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+   v.setOnClickPendingIntent(R.id.widget_root,configPending)
+   v.setOnClickPendingIntent(R.id.widget_title,configPending)
    m.updateAppWidget(id,v);m.notifyAppWidgetViewDataChanged(id,R.id.widget_list);m.notifyAppWidgetViewDataChanged(id,R.id.widget_grid)
   }
   fun refreshAll(c:Context){val m=AppWidgetManager.getInstance(c);m.getAppWidgetIds(ComponentName(c,CategoryWidgetProvider::class.java)).forEach{updateOne(c,m,it)}}
