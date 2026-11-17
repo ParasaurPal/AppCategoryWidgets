@@ -13,8 +13,8 @@ object CategoryStore {
  fun categories(c:Context)=(builtIn+prefs(c).getStringSet("custom_categories",emptySet()).orEmpty()).distinct().sorted()
  fun addCategory(c:Context,name:String){val n=name.trim();if(n.isNotEmpty()&&n!=UNCATEGORIZED){val s=prefs(c).getStringSet("custom_categories",emptySet()).orEmpty().toMutableSet();s.add(n);prefs(c).edit().putStringSet("custom_categories",s).apply()}}
  fun assigned(c:Context,pkg:String)=prefs(c).getString("app:$pkg",null)
- fun assign(c:Context,pkg:String,cat:String){prefs(c).edit().putString("app:$pkg",cat).apply()}
  fun clearCategory(c:Context,pkg:String){prefs(c).edit().remove("app:$pkg").remove("play:$pkg").apply()}
+ fun assign(c:Context,pkg:String,cat:String){prefs(c).edit().putString("app:$pkg",cat).apply()}
  fun cachedPlayCategory(c:Context,pkg:String)=prefs(c).getString("play:$pkg",null)
  fun savePlayCategory(c:Context,pkg:String,cat:String){prefs(c).edit().putString("play:$pkg",cat).apply()}
  fun isUncategorized(c:Context,pkg:String)=assigned(c,pkg)==null&&cachedPlayCategory(c,pkg)==null
