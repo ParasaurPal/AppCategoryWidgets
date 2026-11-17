@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="7dp" android:background="#CC17151E">
+    <TextView android:id="@+id/widget_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#F2EAF8" android:textSize="16sp" android:textStyle="bold" android:padding="6dp" android:text="Apps"/>
+    <ListView android:id="@+id/widget_list" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:divider="#443A45" android:dividerHeight="1dp" android:scrollbars="vertical"/>
+    <TextView android:id="@+id/widget_empty" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="No apps in this category" android:textColor="#BDB4C8" android:padding="8dp"/>
+</LinearLayout>
