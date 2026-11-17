@@ -51,10 +51,10 @@ class MainActivity:Activity(){
  }
  private fun choose(pkg:String){
   val cats=listOf("Unassign (move to Uncategorized)") + CategoryStore.categories(this)
-  AlertDialog.Builder(this).setTitle("Assign category").setItems(cats){_,i->
+  AlertDialog.Builder(this).setTitle("Assign category").setItems(cats.toTypedArray(), { _: android.content.DialogInterface, i: Int ->
    if(i==0)CategoryStore.clearCategory(this,pkg) else CategoryStore.assign(this,pkg,cats[i])
    draw();CategoryWidgetProvider.refreshAll(this)
-  }.setNeutralButton("Create new category"){_,_->addCategory()}.show()
+  }).setNeutralButton("Create new category", { _: android.content.DialogInterface, _: Int -> addCategory() }).show()
  }
  private fun addCategory(){val input=EditText(this).apply{hint="Category name"}
   AlertDialog.Builder(this).setTitle("Create category").setView(input).setPositiveButton("Create"){_,_->filter=input.text.toString().trim();CategoryStore.addCategory(this,filter);draw();CategoryWidgetProvider.refreshAll(this)}.setNegativeButton("Cancel",null).show()
