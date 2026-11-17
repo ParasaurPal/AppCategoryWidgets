@@ -1,6 +1,7 @@
 package com.parasaur.appcategorywidgets
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 
@@ -19,5 +20,15 @@ object CategoryStore {
   ApplicationInfo.CATEGORY_IMAGE->"Photography";ApplicationInfo.CATEGORY_SOCIAL->"Social";ApplicationInfo.CATEGORY_NEWS->"News & Magazines"
   ApplicationInfo.CATEGORY_MAPS->"Maps & Navigation";ApplicationInfo.CATEGORY_PRODUCTIVITY->"Productivity";else->"Other"}
  fun categoryFor(c:Context,i:ApplicationInfo)=assigned(c,i.packageName)?:cachedPlayCategory(c,i.packageName)?:autoCategory(i)
- fun apps(c:Context):List<ApplicationInfo>{val p=c.packageManager;return p.getInstalledApplications(PackageManager.GET_META_DATA).filter{p.getLaunchIntentForPackage(it.packageName)!=null}.sortedBy{p.getApplicationLabel(it).toString().lowercase()}}
+ @Suppress("DEPRECATION")
+ fun apps(c:Context):List<ApplicationInfo>{
+  val p=c.packageManager
+  val launcher=Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+  val launchable=p.queryIntentActivities(launcher,0).asSequence()
+   .filter{it.activityInfo.enabled && it.activityInfo.applicationInfo.enabled}
+   .map{it.activityInfo.packageName}.toSet()
+  return p.getInstalledApplications(PackageManager.GET_META_DATA)
+   .filter{it.packageName in launchable && p.getLaunchIntentForPackage(it.packageName)!=null}
+   .sortedBy{p.getApplicationLabel(it).toString().lowercase()}
+ }
 }

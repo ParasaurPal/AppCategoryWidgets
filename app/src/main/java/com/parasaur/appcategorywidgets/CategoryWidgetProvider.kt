@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.view.View
 import android.widget.RemoteViews
@@ -16,7 +17,10 @@ class CategoryWidgetProvider:AppWidgetProvider(){
   fun updateOne(c:Context,m:AppWidgetManager,id:Int){
    val s=WidgetSettings.load(c,id);val v=RemoteViews(c.packageName,R.layout.category_widget)
    v.setTextViewText(R.id.widget_title,s.category);v.setViewVisibility(R.id.widget_title,if(s.showTitle)View.VISIBLE else View.GONE)
-   v.setInt(R.id.widget_root,"setBackgroundColor",(s.background and 0x00FFFFFF) or ((s.opacity.coerceIn(0,100)*255/100) shl 24))
+   val alpha=(s.opacity.coerceIn(0,100)*255/100)
+   val background=Color.argb(alpha,Color.red(s.background),Color.green(s.background),Color.blue(s.background))
+   v.setInt(R.id.widget_root,"setBackgroundColor",background)
+   v.setInt(R.id.widget_content,"setBackgroundColor",background)
    v.setViewVisibility(R.id.widget_list,if(s.layout=="List")View.VISIBLE else View.GONE)
    v.setViewVisibility(R.id.widget_grid,if(s.layout=="Grid")View.VISIBLE else View.GONE)
    val service=Intent(c,CategoryWidgetService::class.java).putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id)
