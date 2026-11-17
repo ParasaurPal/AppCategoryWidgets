@@ -18,7 +18,7 @@ class WidgetConfigActivity:Activity(){
   root.addView(TextView(this).apply{text="Configure this widget";textSize=23f})
   fun field(label:String,v:View){root.addView(TextView(this).apply{text=label;setPadding(0,9,0,2)});root.addView(v)}
   fun spinner(items:List<String>,sel:String)=Spinner(this).apply{adapter=ArrayAdapter(this@WidgetConfigActivity,android.R.layout.simple_spinner_dropdown_item,items);setSelection(items.indexOf(sel).coerceAtLeast(0))}
-  val cat=spinner(listOf("All apps")+CategoryStore.categories(this),old.category);field("Category",cat)
+  val cat=spinner(listOf("All apps",CategoryStore.UNCATEGORIZED)+CategoryStore.categories(this),old.category);field("Category",cat)
   val mode=spinner(listOf("List","Grid"),old.layout);field("Layout",mode)
   val sort=spinner(listOf("A–Z","Z–A"),old.sort);field("Sort",sort)
   fun seek(min:Int,max:Int,value:Int)=SeekBar(this).apply{this.max=max-min;progress=(value-min).coerceIn(0,this.max);tag=min}

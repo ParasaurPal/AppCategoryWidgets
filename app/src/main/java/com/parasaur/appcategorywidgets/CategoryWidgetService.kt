@@ -15,7 +15,7 @@ class CategoryWidgetService:RemoteViewsService(){
   override fun onCreate(){}
   override fun onDataSetChanged(){
    s=WidgetSettings.load(c,id)
-   val list=CategoryStore.apps(c).filter{s.category=="All apps"||CategoryStore.categoryFor(c,it)==s.category}
+   val list=CategoryStore.apps(c).filter{when(s.category){"All apps"->true;CategoryStore.UNCATEGORIZED->CategoryStore.isUncategorized(c,it.packageName);else->CategoryStore.categoryFor(c,it)==s.category}}
    items=if(s.sort=="Z–A")list.sortedByDescending{c.packageManager.getApplicationLabel(it).toString().lowercase()}else list
   }
   override fun onDestroy(){}
