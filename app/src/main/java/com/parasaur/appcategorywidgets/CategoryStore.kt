@@ -27,11 +27,15 @@ object CategoryStore {
  fun apps(c:Context):List<ApplicationInfo>{
   val p=c.packageManager
   val launcher=Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-  val launchable=p.queryIntentActivities(launcher,0).asSequence()
+  // The launcher query is the authoritative source for apps with a home-screen
+  // launch activity. Keep its ApplicationInfo directly instead of querying all
+  // installed packages a second time and accidentally dropping valid results.
+  return p.queryIntentActivities(launcher,PackageManager.MATCH_DEFAULT_ONLY)
+   .asSequence()
    .filter{it.activityInfo.enabled && it.activityInfo.applicationInfo.enabled}
-   .map{it.activityInfo.packageName}.toSet()
-  return p.getInstalledApplications(PackageManager.GET_META_DATA)
-   .filter{it.packageName in launchable && p.getLaunchIntentForPackage(it.packageName)!=null}
+   .map{it.activityInfo.applicationInfo}
+   .distinctBy{it.packageName}
    .sortedBy{p.getApplicationLabel(it).toString().lowercase()}
+   .toList()
  }
 }
