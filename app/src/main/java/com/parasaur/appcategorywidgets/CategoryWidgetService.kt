@@ -3,7 +3,8 @@ package com.parasaur.appcategorywidgets
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.Intent
-import android.graphics.drawable.Icon
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 
@@ -27,7 +28,13 @@ class CategoryWidgetService:RemoteViewsService(){
    row.setTextColor(R.id.app_name,s.textColor);row.setTextViewTextSize(R.id.app_name,android.util.TypedValue.COMPLEX_UNIT_SP,s.textSize.toFloat())
    row.setViewVisibility(R.id.app_icon,if(s.showIcons)android.view.View.VISIBLE else android.view.View.GONE)
    row.setInt(R.id.app_icon,"setMaxWidth",s.iconSize);row.setInt(R.id.app_icon,"setMaxHeight",s.iconSize)
-   if(s.showIcons)row.setImageViewIcon(R.id.app_icon,Icon.createWithDrawable(c.packageManager.getApplicationIcon(app)))
+   if(s.showIcons){
+    val drawable=c.packageManager.getApplicationIcon(app)
+    val bitmap=Bitmap.createBitmap(drawable.intrinsicWidth.coerceAtLeast(1),drawable.intrinsicHeight.coerceAtLeast(1),Bitmap.Config.ARGB_8888)
+    drawable.setBounds(0,0,bitmap.width,bitmap.height)
+    drawable.draw(Canvas(bitmap))
+    row.setImageViewBitmap(R.id.app_icon,bitmap)
+   }
    c.packageManager.getLaunchIntentForPackage(app.packageName)?.let{launch->
     val pi=PendingIntent.getActivity(c,id*100000+(app.packageName.hashCode() and 0x7fffffff),launch,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     row.setOnClickPendingIntent(R.id.app_row,pi)
