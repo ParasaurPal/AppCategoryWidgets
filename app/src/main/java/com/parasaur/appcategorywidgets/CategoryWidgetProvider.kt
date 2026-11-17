@@ -46,7 +46,8 @@ class CategoryWidgetProvider:AppWidgetProvider(){
    v.setOnClickPendingIntent(R.id.widget_config,config)
    v.setOnClickPendingIntent(R.id.widget_title,config)
    m.updateAppWidget(id,v)
-   m.notifyAppWidgetViewDataChanged(id,intArrayOf(R.id.widget_list,R.id.widget_grid))
+   m.notifyAppWidgetViewDataChanged(id,R.id.widget_list)
+   m.notifyAppWidgetViewDataChanged(id,R.id.widget_grid)
   }
   fun refreshAll(c:Context){val m=AppWidgetManager.getInstance(c);m.getAppWidgetIds(ComponentName(c,CategoryWidgetProvider::class.java)).forEach{updateOne(c,m,it)}}
  }
