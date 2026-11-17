@@ -1,9 +1,7 @@
 package com.parasaur.appcategorywidgets
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 
 object CategoryStore {
  private const val PREFS="category_store"
@@ -26,16 +24,10 @@ object CategoryStore {
  @Suppress("DEPRECATION")
  fun apps(c:Context):List<ApplicationInfo>{
   val p=c.packageManager
-  val launcher=Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-  // The launcher query is the authoritative source for apps with a home-screen
-  // launch activity. Keep its ApplicationInfo directly instead of querying all
-  // installed packages a second time and accidentally dropping valid results.
-  return p.queryIntentActivities(launcher,PackageManager.MATCH_DEFAULT_ONLY)
-   .asSequence()
-   .filter{it.activityInfo.enabled && it.activityInfo.applicationInfo.enabled}
-   .map{it.activityInfo.applicationInfo}
-   .distinctBy{it.packageName}
+  // Include every installed application package, including preinstalled/system
+  // apps that do not publish a launcher icon. The widget can still show their
+  // names; tapping one opens it only when Android provides a launch intent.
+  return p.getInstalledApplications(0)
    .sortedBy{p.getApplicationLabel(it).toString().lowercase()}
-   .toList()
  }
 }
