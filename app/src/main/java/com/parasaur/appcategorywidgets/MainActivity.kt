@@ -10,7 +10,7 @@ import java.util.concurrent.Executors
 
 class MainActivity:Activity(){
  private lateinit var root:LinearLayout;private var filter="All apps";private val executor=Executors.newSingleThreadExecutor()
- override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);draw()}
+ override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);draw();autoLookupCategories()}
  override fun onDestroy(){executor.shutdownNow();super.onDestroy()}
  private fun draw(){
   root=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;setPadding(18,20,18,12);setBackgroundColor(0xFF17151E.toInt())}
@@ -20,7 +20,7 @@ class MainActivity:Activity(){
   actions.addView(Button(this).apply{text="New category";setOnClickListener{addCategory()}},LinearLayout.LayoutParams(0,-2,1f))
   actions.addView(Button(this).apply{text="Look up Play Store categories";setOnClickListener{lookup(this)}},LinearLayout.LayoutParams(0,-2,1f))
   root.addView(actions)
-  root.addView(TextView(this).apply{text="Play Store lookup reads public listing metadata when available. Google has no supported public category API; failed lookups can be assigned manually.";textSize=12f;setTextColor(0xFFBDB4C8.toInt());setPadding(2,4,2,8)})
+  root.addView(TextView(this).apply{text="Categories are detected automatically from Google Play listing metadata when available. You can change any category manually; apps without a listing result remain Uncategorized or use Android app-type fallback.";textSize=12f;setTextColor(0xFFBDB4C8.toInt());setPadding(2,4,2,8)})
   root.addView(TextView(this).apply{text="Add widgets from your home screen: long-press → Widgets → App Category Widgets. Configure each widget separately.";setTextColor(0xFFE0D3ED.toInt());setPadding(2,4,2,8)})
   val scroll=ScrollView(this);val list=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL};scroll.addView(list);root.addView(scroll,LinearLayout.LayoutParams(-1,0,1f));setContentView(root)
   val choices=listOf("All apps",CategoryStore.UNCATEGORIZED)+CategoryStore.categories(this);val spinner=Spinner(this);spinner.adapter=ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,choices);spinner.setSelection(choices.indexOf(filter).coerceAtLeast(0));list.addView(spinner)
@@ -39,6 +39,17 @@ class MainActivity:Activity(){
    label.addView(TextView(this).apply{text="Category: "+(if(uncategorized)CategoryStore.UNCATEGORIZED else CategoryStore.categoryFor(this@MainActivity,info))+" • "+src;textSize=12f;setTextColor(0xFFBDB4C8.toInt())})
    row.addView(label,LinearLayout.LayoutParams(0,-2,1f));row.addView(Button(this).apply{text="Change";setOnClickListener{choose(info.packageName)}});list.addView(row)
    list.addView(View(this).apply{setBackgroundColor(0xFF393341.toInt())},LinearLayout.LayoutParams(-1,1))
+  }
+ }
+ private fun autoLookupCategories(){
+  executor.execute{
+   var changed=false
+   CategoryStore.apps(this).forEach{app->
+    if(CategoryStore.assigned(this,app.packageName)==null&&CategoryStore.cachedPlayCategory(this,app.packageName)==null){
+     if(PlayStoreCategoryLookup.lookup(this,app.packageName)!=null)changed=true
+    }
+   }
+   if(changed)runOnUiThread{draw();CategoryWidgetProvider.refreshAll(this)}
   }
  }
  private fun lookup(button:Button){
